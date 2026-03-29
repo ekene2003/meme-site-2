@@ -2,21 +2,43 @@
    TOKEN CONFIG
 ══════════════════════════════ */
 const TOKENS = [
-  { name: "ODAI",     sub: "ODEI AI",    img: "./assets/images/odai.webp",     chain: "base", receiver: "0x9349...44e0", rcolor: "#f5a623" },
-  { name: "NOELCLAW", sub: "Noel Claw",  img: "./assets/images/noelclaw.webp", chain: "base", receiver: "0x179b...a02e", rcolor: "#fbbf24" },
-  { name: "OSO",      sub: "Osobot",     img: "./assets/images/oso-_1_.webp",  chain: "base", receiver: "0xa184...7F2B", rcolor: "#f59e0b" },
-  { name: "TAKEOVER", sub: "Takeover",   img: "./assets/images/takeover.webp", chain: "base", receiver: "0x93e7...4bdC", rcolor: "#d4891a" },
-  { name: "FLNCHY",   sub: "Flinchy",    img: "./assets/images/flichy.png",    chain: "base", receiver: "0x2f41...8aEd", rcolor: "#3b82f6" },
-  { name: "MLTL",     sub: "Multilabel", img: "./assets/images/mltl.webp",     chain: "base", receiver: "0x7c32...91fA", rcolor: "#8b5cf6" },
-  { name: "DOGAI",    sub: "Dog AI",     img: "./assets/images/kimiclaw.webp", chain: "base", receiver: "0x4d9a...22bE", rcolor: "#f5a623" },
-  { name: "ZXBT",     sub: "ZXBT",       img: "./assets/images/zxbt.webp",     chain: "base", receiver: "0x8e1f...33cD", rcolor: "#fbbf24" },
+  { name: "ODAI",     sub: "ODEI AI",    img: "./assets/images/odai.webp",     chain: "base",   receiver: "0x9349...44e0", rcolor: "#f5a623" },
+  { name: "NOELCLAW", sub: "Noel Claw",  img: "./assets/images/noelclaw.webp", chain: "base",   receiver: "0x179b...a02e", rcolor: "#fbbf24" },
+  { name: "OSO",      sub: "Osobot",     img: "./assets/images/oso-_1_.webp",  chain: "base",   receiver: "0xa184...7F2B", rcolor: "#f59e0b" },
+  { name: "TAKEOVER", sub: "Takeover",   img: "./assets/images/takeover.webp", chain: "base",   receiver: "0x93e7...4bdC", rcolor: "#d4891a" },
+  { name: "FLNCHY",   sub: "Flinchy",    img: "./assets/images/flichy.png",    chain: "base",   receiver: "0x2f41...8aEd", rcolor: "#3b82f6" },
+  { name: "MLTL",     sub: "Multilabel", img: "./assets/images/mltl.webp",     chain: "base",   receiver: "0x7c32...91fA", rcolor: "#8b5cf6" },
+  { name: "DOGAI",    sub: "Dog AI",     img: "./assets/images/kimiclaw.webp", chain: "base",   receiver: "0x4d9a...22bE", rcolor: "#f5a623" },
+  { name: "ZXBT",     sub: "ZXBT",       img: "./assets/images/zxbt.webp",     chain: "base",   receiver: "0x8e1f...33cD", rcolor: "#fbbf24" },
+  {
+    name:     "CVT",
+    sub:      "CoinVault Token",
+    img:      "./assets/images/download.jpeg",
+    chain:    "solana",
+    ca:       "5aYjJdXSobATG1rFbdBz8wd2jrJbHhNNbU1LbJKgYGV5",
+    receiver: "5aYjJd...YGV5",
+    rcolor:   "#f5a623",
+    price:    0.001,
+    mcap:     "$1,000,000",
+    vol:      "--",
+    change:   0,
+    earned:   "--",
+    isStatic: true,
+  },
 ];
 
 /* ══════════════════════════════
    LIVE DATA STORE
+   static tokens keep their preset
+   price/mcap and won't be overwritten
 ══════════════════════════════ */
 let liveData = TOKENS.map(t => ({
-  ...t, price: null, mcap: "--", vol: "--", change: 0, earned: "--",
+  ...t,
+  price:  t.price  || null,
+  mcap:   t.mcap   || "--",
+  vol:    t.vol    || "--",
+  change: t.change || 0,
+  earned: t.earned || "--",
 }));
 
 /* ══════════════════════════════
@@ -81,7 +103,7 @@ async function fetchTokenPrice(token) {
 
 async function fetchAllPrices() {
   const results = await Promise.all(TOKENS.map(fetchTokenPrice));
-  results.forEach((r, i) => { if (r) liveData[i] = { ...liveData[i], ...r }; });
+  results.forEach((r, i) => { if (r && !TOKENS[i].isStatic) liveData[i] = { ...liveData[i], ...r }; });
   renderTable(liveData);
   updateHeroStats(liveData);
   updateHeroCoins(liveData);
@@ -135,15 +157,49 @@ async function runSearch(query, dropdown) {
   </div>`;
   dropdown.style.display = "block";
 
-  try {
-    const res  = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(query)}`);
-    const data = await res.json();
-    const pairs = data.pairs || [];
+  const q = query.trim().toLowerCase();
 
-    if (pairs.length === 0) {
-      dropdown.innerHTML = `<div class="sd-empty">No tokens found for "<strong>${query}</strong>"</div>`;
-      return;
-    }
+  // Always check local tokens first (including static ones not on DexScreener)
+  const localMatches = TOKENS.filter(t =>
+    t.name.toLowerCase().includes(q) ||
+    t.sub.toLowerCase().includes(q) ||
+    (t.ca && t.ca.toLowerCase().includes(q))
+  );
+
+  // Build local result cards
+  function localCard(t) {
+    const live      = liveData.find(d => d.name === t.name) || t;
+    const priceStr  = live.price ? "$" + (live.price < 0.01 ? live.price.toFixed(6) : live.price.toFixed(4)) : "--";
+    const chgClass  = live.change >= 0 ? "sd-pos" : "sd-neg";
+    const chgSign   = live.change >= 0 ? "↑" : "↓";
+    const shortCA   = t.ca ? t.ca.slice(0,6) + "..." + t.ca.slice(-4) : "Local token";
+    const mcapDisp  = live.mcap && live.mcap !== "--" ? live.mcap : (t.mcap || "--");
+    return `
+      <div class="sd-item sd-local" onclick="selectSearchResult('${t.name}','${t.ca||""}','${t.chain||""}','${live.price||0}','${t.img}')">
+        <div class="sd-item-left">
+          <img src="${t.img}" onerror="this.src='./assets/images/odai.webp'" class="sd-img" alt="${t.name}">
+          <div class="sd-item-info">
+            <div class="sd-item-name">
+              <span class="sd-symbol">${t.name}</span>
+              <span class="sd-fullname">${t.sub}</span>
+              <span class="sd-chain-badge">${t.chain || "local"}</span>
+              ${t.isStatic ? '<span class="sd-chain-badge" style="background:rgba(245,166,35,0.15);color:#f5a623;border-color:rgba(245,166,35,0.3);">Listed</span>' : ""}
+            </div>
+            <div class="sd-item-addr">${shortCA}</div>
+          </div>
+        </div>
+        <div class="sd-item-right">
+          <div class="sd-price">${priceStr}</div>
+          <div class="${chgClass}">${live.change !== 0 ? chgSign + " " + Math.abs(live.change).toFixed(2) + "%" : "--"}</div>
+          <div class="sd-meta">MCap ${mcapDisp}</div>
+        </div>
+      </div>`;
+  }
+
+  try {
+    const res   = await fetch(`https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(query)}`);
+    const data  = await res.json();
+    const pairs = data.pairs || [];
 
     // Deduplicate by token address, keep highest liquidity pair per token
     const seen = new Map();
@@ -155,21 +211,28 @@ async function runSearch(query, dropdown) {
       }
     }
 
-    // Take top 8 results sorted by liquidity
+    // Filter out any DexScreener results that match our local tokens (avoid duplicates)
+    const localCAs = new Set(TOKENS.map(t => (t.ca || "").toLowerCase()));
     const top = [...seen.values()]
+      .filter(p => !localCAs.has((p.baseToken?.address || "").toLowerCase()))
       .sort((a,b) => (b.liquidity?.usd||0) - (a.liquidity?.usd||0))
-      .slice(0, 8);
+      .slice(0, 6);
 
-    dropdown.innerHTML = top.map(p => {
-      const symbol  = p.baseToken?.symbol  || "?";
-      const name    = p.baseToken?.name    || symbol;
-      const addr    = p.baseToken?.address || "";
-      const chain   = p.chainId            || "";
-      const price   = parseFloat(p.priceUsd) || 0;
-      const change  = parseFloat(p.priceChange?.h24) || 0;
-      const mcap    = fmtUSD(p.fdv || p.marketCap || 0);
-      const vol     = fmtUSD(p.volume?.h24 || 0);
-      const liq     = fmtUSD(p.liquidity?.usd || 0);
+    // If no external results AND no local matches
+    if (top.length === 0 && localMatches.length === 0) {
+      dropdown.innerHTML = `<div class="sd-empty">No tokens found for "<strong>${query}</strong>"</div>`;
+      return;
+    }
+
+    // Build external result cards
+    const externalCards = top.map(p => {
+      const symbol   = p.baseToken?.symbol  || "?";
+      const name     = p.baseToken?.name    || symbol;
+      const addr     = p.baseToken?.address || "";
+      const chain    = p.chainId            || "";
+      const price    = parseFloat(p.priceUsd) || 0;
+      const change   = parseFloat(p.priceChange?.h24) || 0;
+      const mcap     = fmtUSD(p.fdv || p.marketCap || 0);
       const chgClass = change >= 0 ? "sd-pos" : "sd-neg";
       const chgSign  = change >= 0 ? "↑" : "↓";
       const shortAddr = addr ? addr.slice(0,6) + "..." + addr.slice(-4) : "";
@@ -177,10 +240,7 @@ async function runSearch(query, dropdown) {
                       : price < 0.01     ? "$" + price.toFixed(6)
                       : price < 1        ? "$" + price.toFixed(4)
                       :                    "$" + price.toFixed(2);
-
-      // Try to match a local image for known tokens
-      const localToken = TOKENS.find(t => t.name.toUpperCase() === symbol.toUpperCase());
-      const imgSrc = localToken ? localToken.img : `https://dd.dexscreener.com/ds-data/tokens/${chain}/${addr}.png`;
+      const imgSrc = `https://dd.dexscreener.com/ds-data/tokens/${chain}/${addr}.png`;
 
       return `
         <div class="sd-item" data-addr="${addr}" data-chain="${chain}" onclick="selectSearchResult('${symbol}','${addr}','${chain}','${p.priceUsd || 0}','${imgSrc}')">
@@ -198,16 +258,30 @@ async function runSearch(query, dropdown) {
           <div class="sd-item-right">
             <div class="sd-price">${priceStr}</div>
             <div class="${chgClass}">${chgSign} ${Math.abs(change).toFixed(2)}%</div>
-            <div class="sd-meta">MCap ${mcap} · Vol ${vol}</div>
+            <div class="sd-meta">MCap ${mcap}</div>
           </div>
         </div>`;
-    }).join("");
+    });
+
+    // Divider between local and external
+    const divider = (localMatches.length > 0 && top.length > 0)
+      ? `<div style="padding:6px 14px;font-size:10px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.08em;border-top:1px solid rgba(255,255,255,0.05);">External results</div>`
+      : "";
+
+    dropdown.innerHTML =
+      localMatches.map(localCard).join("") +
+      divider +
+      externalCards.join("");
 
   } catch(e) {
-    dropdown.innerHTML = `<div class="sd-empty">Search failed. Check your connection.</div>`;
+    // If DexScreener fails, still show local matches
+    if (localMatches.length > 0) {
+      dropdown.innerHTML = localMatches.map(localCard).join("");
+    } else {
+      dropdown.innerHTML = `<div class="sd-empty">Search failed. Check your connection.</div>`;
+    }
   }
 }
-
 function closeDropdown(dropdown) {
   if (dropdown) dropdown.style.display = "none";
 }
@@ -869,3 +943,69 @@ function drawSPChart(token, tf) {
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeSidePanel();
 });
+
+/* ══════════════════════════════
+   ONLINE COUNTER
+   — Time-aware: more users during
+     day, fewer at night
+   — Random drift every few seconds
+   — Smooth number transition
+══════════════════════════════ */
+function initOnlineCounter() {
+  const countEl = document.getElementById("onlineCount");
+  if (!countEl) return;
+
+  // Base online count by hour of day (0–23)
+  // Peaks around midday, lower at night
+  const hourlyBase = [
+    38, 29, 22, 18, 15, 20,   // 00–05 (night, low)
+    35, 58, 88, 120, 148, 165, // 06–11 (morning ramp)
+    180, 175, 168, 160, 155, 162, // 12–17 (afternoon peak)
+    158, 145, 130, 110, 85, 60,   // 18–23 (evening wind down)
+  ];
+
+  function getBaseCount() {
+    const hour = new Date().getHours();
+    return hourlyBase[hour];
+  }
+
+  // Smooth number counter animation
+  let displayed = getBaseCount();
+  let target    = displayed;
+
+  function animateTo(newTarget) {
+    const step = newTarget > displayed ? 1 : -1;
+    const interval = setInterval(() => {
+      displayed += step;
+      countEl.textContent = displayed;
+      if (displayed === newTarget) clearInterval(interval);
+    }, 120);
+  }
+
+  // Initial display
+  countEl.textContent = displayed;
+
+  // Drift: every 4–9 seconds pick a new target close to base
+  function scheduleNextChange() {
+    const delay = (20 + Math.random() * 20) * 1000; // 20–40 sec // 4–9 sec
+    setTimeout(() => {
+      const base    = getBaseCount();
+      const spread  = Math.floor(base * 0.18); // ±18% of base
+      const drift   = Math.floor((Math.random() * 2 - 1) * spread);
+      target        = Math.max(8, base + drift);
+
+      // Flash the count briefly then animate
+      countEl.style.opacity = "0.4";
+      setTimeout(() => {
+        countEl.style.opacity = "1";
+        animateTo(target);
+      }, 150);
+
+      scheduleNextChange();
+    }, delay);
+  }
+
+  scheduleNextChange();
+}
+
+document.addEventListener("DOMContentLoaded", initOnlineCounter);

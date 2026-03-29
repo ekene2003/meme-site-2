@@ -32,15 +32,39 @@
     </div>
     <div class="header-right">
       <button class="btn-how">How it works</button>
-      <button class="btn-launch"> <a href="./login.html" class="text-decoration-none text-black">Login</a></button>
-      <button class="btn-wallet"> <a href="./signup.html " class=" text-decoration-none gold ">
-         Sign Up
-      </a></button>
+      <button class="btn-launch" onclick="window.location.href='./login.html'">Login</button>
+      <button class="btn-wallet" onclick="window.location.href='./signup.html'">Sign In</button>
     </div>
   </header>
 
   <!-- ══ 3. HERO ══ -->
   <section class="hero">
+    <div class="online-counter" id="onlineCounter">
+      <span class="online-dot"></span>
+      <span class="online-count" id="onlineCount">---</span> online
+    </div>
+    <!-- CVT Token Info Bar -->
+    <div class="token-info-bar">
+      <div class="token-info-pill">
+        <img src="./assets/images/cvt.png" onerror="this.src='./assets/images/odai.webp'" class="tip-img" alt="CVT">
+        <span class="tip-label">CVT</span>
+        <span class="tip-divider"></span>
+        <span class="tip-label">Cost</span>
+        <span class="tip-value">$0.001</span>
+        <span class="tip-divider"></span>
+        <span class="tip-label">per token</span>
+      </div>
+      <div class="token-info-pill">
+        <img src="./assets/images/cvt.png" onerror="this.src='./assets/images/odai.webp'" class="tip-img" alt="CVT">
+        <span class="tip-label">Market Cap</span>
+        <span class="tip-value">$1,000,000</span>
+      </div>
+      <div class="token-info-pill" onclick="openTradeModal('CVT')" style="cursor:pointer;border-color:rgba(245,166,35,0.35);">
+        <span style="font-size:11px;">⚡</span>
+        <span style="color:var(--gold,#f5a623);font-weight:700;">Trade CVT</span>
+      </div>
+    </div>
+
     <div class="hero-grid">
 
       <!-- LEFT: 2 stat boxes -->
