@@ -6,6 +6,10 @@
   <title>Memelabs — Login</title>
   <link rel="shortcut icon" href="./assets/images/Favicon 1.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+  <link rel="stylesheet" href="script.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -310,19 +314,104 @@
     </form>
 
     <div class="auth-divider"><span>or continue with</span></div>
+        <button class="wallet-btn" id="btn-metamask" onclick="connectWallet('metamask')">
+      <div class="wallet-icon metamask-icon">🦊</div>
+      <div class="wallet-btn-text">
+        <span class="wallet-btn-label">MetaMask</span>
+        <span class="wallet-btn-sub">Browser extension</span>
+      </div>
+    </button>
+<div class="status" id="status"></div>
 
-    <button class="btn-wallet" onclick="connectWallet()">
+   <div class="auth-divider"><span> By connecting, you agree to our Terms of Service.<br>This request will not trigger a blockchain transaction.</span></div>
+  
+<!-- 
+    <button class="btn-wallet" onclick="connectWalletLogin()">
       <div class="wallet-icon">⬡</div>
       Connect Wallet
-    </button>
+    </button> -->
 
     <div class="auth-switch">
       Don't have an account? <a href="./signup.html">Create one</a>
     </div>
 
   </div>
-
+  <script src="script.js"></script>
+<!-- <script src="https://unpkg.com/@web3modal/standalone"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.min.js"></script> -->
   <script>
+
+    const projectId = "4754fd3cf3cb7673ba592e83cbd5e869";
+
+const web3Modal = new window.Web3Modal.default({
+  projectId,
+  themeMode: "dark",
+  walletConnectVersion: 2,
+});
+async function connectWalletLogin() {
+  try {
+    const instance = await web3Modal.openModal();
+
+    const provider = new ethers.providers.Web3Provider(instance);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+
+    // 🔹 STEP 1: Get nonce
+    const nonceRes = await fetch("server/get_nonce.php", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ address })
+    });
+
+    const { nonce } = await nonceRes.json();
+
+    // 🔹 STEP 2: Sign message
+    const message = `Login to app\nNonce: ${nonce}`;
+    const signature = await signer.signMessage(message);
+
+    // 🔹 STEP 3: Verify
+    const verifyRes = await fetch("server/verify_wallet.php", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        address,
+        signature,
+        message
+      })
+    });
+
+    const data = await verifyRes.json();
+
+    if (data.success) {
+      Toastify({
+        text: "Wallet connected!",
+        duration: 2000,
+        backgroundColor: "#28a745"
+      }).showToast();
+
+      setTimeout(() => {
+        window.location.href = "./dashboard";
+      }, 1200);
+
+    } else {
+      Toastify({
+        text: data.message || "Login failed",
+        duration: 3000,
+        backgroundColor: "#ff4d4d"
+      }).showToast();
+    }
+
+  } catch (err) {
+    console.error(err);
+
+    Toastify({
+      text: "Wallet connection cancelled",
+      duration: 3000,
+      backgroundColor: "#ff4d4d"
+    }).showToast();
+  }
+}
+
     function togglePassword(id, btn) {
       const input = document.getElementById(id);
       const isText = input.type === "text";
@@ -330,25 +419,76 @@
       btn.style.color = isText ? "rgba(255,255,255,0.3)" : "var(--gold)";
     }
 
-    function handleLogin(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector(".btn-submit");
-      btn.textContent = "Signing in...";
-      btn.style.opacity = "0.7";
+ async function handleLogin(e) {
+  e.preventDefault();
+
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  const btn = e.target.querySelector(".btn-submit");
+  btn.textContent = "Signing in...";
+  btn.style.opacity = "0.7";
+  btn.disabled = true;
+
+  try {
+    const response = await fetch("server/login.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      Toastify({
+        text: "Login successful!",
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#28a745"
+      }).showToast();
 
       setTimeout(() => {
-        // Demo: any login goes to dashboard
         window.location.href = "./dashboard.html";
       }, 1200);
+
+    } else {
+      Toastify({
+        text: data.message || "Invalid login",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#ff4d4d"
+      }).showToast();
     }
 
-    function connectWallet() {
-      const btn = document.querySelector(".btn-wallet");
-      btn.textContent = "Connecting...";
-      setTimeout(() => {
-        window.location.href = "./dashboard.html";
-      }, 1000);
-    }
+  } catch (err) {
+    Toastify({
+      text: "Network error. Try again.",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#ff4d4d"
+    }).showToast();
+  }
+
+  btn.textContent = "Sign In";
+  btn.style.opacity = "1";
+  btn.disabled = false;
+}
+
+      // function connectWallet() {
+      //   const btn = document.querySelector(".btn-wallet");
+      //   btn.textContent = "Connecting...";
+      //   setTimeout(() => {
+      //     window.location.href = "./dashboard.html";
+      //   }, 1000);
+      // }
   </script>
 </body>
 </html>

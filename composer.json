@@ -1,0 +1,13 @@
+{
+  "name": "myapp/wallet-login",
+  "description": "PHP wallet-based authentication using Ethereum signatures",
+  "require": {
+    "php": ">=8.0",
+    "kornrunner/keccak": "^1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "MyApp\\": "src/"
+    }
+  }
+}

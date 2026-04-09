@@ -6,6 +6,8 @@
   <title>Memelabs — Sign Up</title>
   <link rel="shortcut icon" href="./assets/images/Favicon 1.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -271,7 +273,7 @@
       </div>
     </div>
 
-    <form onsubmit="handleSignup(event)" id="signupForm">
+    <form onsubmit="handleSignup(event)" id="signupForm" method="POST">
 
       <!-- Step 1: Basic info -->
       <div id="formStep1">
@@ -420,26 +422,87 @@
       document.getElementById("step2label").className  = "step-label active";
     }
 
-    function handleSignup(e) {
-      e.preventDefault();
-      const pw  = document.getElementById("signupPassword").value;
-      const cpw = document.getElementById("confirmPassword").value;
-      if (pw !== cpw) { alert("Passwords don't match!"); return; }
+    async function handleSignup(e) {
+  e.preventDefault();
 
-      const btn = e.target.querySelector(".btn-submit");
-      btn.textContent = "Creating account...";
-      btn.disabled    = true;
+  const pw  = document.getElementById("signupPassword").value;
+  const cpw = document.getElementById("confirmPassword").value;
+  const email = document.getElementById("signupEmail").value;
+  const name  = document.getElementById("username").value;
 
-      // Update step 3
+  if (pw !== cpw) {
+    Toastify({
+      text: "Passwords don't match!",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#ff4d4d"
+    }).showToast();
+    return;
+  }
+
+  const btn = e.target.querySelector(".btn-submit");
+  btn.textContent = "Creating account...";
+  btn.disabled = true;
+
+  try {
+    const response = await fetch("server/signup.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: name,
+        email: email,
+        password: pw
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      Toastify({
+        text: "Account created successfully!",
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#28a745"
+      }).showToast();
+
+      // Progress UI update
       document.getElementById("step2circle").className = "step-circle done";
       document.getElementById("step2circle").textContent = "✓";
       document.getElementById("line2").classList.add("done");
       document.getElementById("step3circle").className = "step-circle active";
-      document.getElementById("step3label").className  = "step-label active";
+      document.getElementById("step3label").className = "step-label active";
 
-      setTimeout(() => { window.location.href = "./dashboard.html"; }, 1200);
+      setTimeout(() => {
+        window.location.href = "./dashboard.html";
+      }, 1500);
+
+    } else {
+      Toastify({
+        text: data.message || "Signup failed",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#ff4d4d"
+      }).showToast();
     }
 
+  } catch (err) {
+    Toastify({
+      text: "Network error. Try again.",
+      duration: 3000,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#ff4d4d"
+    }).showToast();
+  }
+
+  btn.textContent = "Sign Up";
+  btn.disabled = false;
+}
     function connectWallet() {
       const btn = document.querySelector(".btn-wallet");
       btn.textContent = "Connecting...";

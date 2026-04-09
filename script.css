@@ -1,0 +1,64 @@
+.wallet-btn {
+      width: 100%;
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 16px;
+      background: #1e2330;
+      border: 1px solid #2a3040;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 10px;
+      color: #e8eaf0;
+      font-size: 14px; font-weight: 500;
+    }
+
+    .wallet-btn:hover { border-color: #1D9E75; background: #1a2a24; }
+    .wallet-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .wallet-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .metamask-icon { background: #fff3e0; }
+    .wc-icon { background: #e3f0ff; }
+
+    .wallet-btn-text { text-align: left; }
+    .wallet-btn-label { display: block; font-size: 14px; font-weight: 500; }
+    .wallet-btn-sub { display: block; font-size: 11px; color: #6b7280; margin-top: 1px; }
+
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 16px 0; color: #3a4050; font-size: 12px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #2a3040;
+    }
+
+    .status {
+      margin-top: 1.25rem;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      display: none;
+    }
+    .status.info    { display: block; background: #0d2031; color: #5bb8f5; border: 1px solid #1a3a55; }
+    .status.success { display: block; background: #0d2318; color: #34d399; border: 1px solid #14432e; }
+    .status.error   { display: block; background: #2a0f0f; color: #f87171; border: 1px solid #4a1f1f; }
+
+    .address-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #1a2a24; border: 1px solid #1D9E75;
+      border-radius: 8px; padding: 6px 12px;
+      font-family: monospace; font-size: 13px; color: #34d399;
+      margin-top: 10px;
+    }
+
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid currentColor; border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
