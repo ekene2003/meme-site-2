@@ -318,7 +318,7 @@
       <div class="wallet-icon metamask-icon">🦊</div>
       <div class="wallet-btn-text">
         <span class="wallet-btn-label">MetaMask</span>
-        <span class="wallet-btn-sub">Browser extension</span>
+        <span class="wallet-btn-sub">Wallet Login</span>
       </div>
     </button>
 <div class="status" id="status"></div>
@@ -341,77 +341,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.min.js"></script> -->
   <script>
 
-    const projectId = "4754fd3cf3cb7673ba592e83cbd5e869";
-
-const web3Modal = new window.Web3Modal.default({
-  projectId,
-  themeMode: "dark",
-  walletConnectVersion: 2,
-});
-async function connectWalletLogin() {
-  try {
-    const instance = await web3Modal.openModal();
-
-    const provider = new ethers.providers.Web3Provider(instance);
-    const signer = provider.getSigner();
-    const address = await signer.getAddress();
-
-    // 🔹 STEP 1: Get nonce
-    const nonceRes = await fetch("server/get_nonce.php", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ address })
-    });
-
-    const { nonce } = await nonceRes.json();
-
-    // 🔹 STEP 2: Sign message
-    const message = `Login to app\nNonce: ${nonce}`;
-    const signature = await signer.signMessage(message);
-
-    // 🔹 STEP 3: Verify
-    const verifyRes = await fetch("server/verify_wallet.php", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        address,
-        signature,
-        message
-      })
-    });
-
-    const data = await verifyRes.json();
-
-    if (data.success) {
-      Toastify({
-        text: "Wallet connected!",
-        duration: 2000,
-        backgroundColor: "#28a745"
-      }).showToast();
-
-      setTimeout(() => {
-        window.location.href = "./dashboard";
-      }, 1200);
-
-    } else {
-      Toastify({
-        text: data.message || "Login failed",
-        duration: 3000,
-        backgroundColor: "#ff4d4d"
-      }).showToast();
-    }
-
-  } catch (err) {
-    console.error(err);
-
-    Toastify({
-      text: "Wallet connection cancelled",
-      duration: 3000,
-      backgroundColor: "#ff4d4d"
-    }).showToast();
-  }
-}
-
+    
     function togglePassword(id, btn) {
       const input = document.getElementById(id);
       const isText = input.type === "text";
@@ -454,7 +384,7 @@ async function connectWalletLogin() {
       }).showToast();
 
       setTimeout(() => {
-        window.location.href = "./dashboard.html";
+        window.location.href = "./dashboard";
       }, 1200);
 
     } else {

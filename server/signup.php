@@ -55,6 +55,8 @@ if ($stmt->execute()) {
     $last_id = $conn->insert_id;
     $_SESSION['user_id'] = $last_id;
     $_SESSION['user_name'] = $name;
+    $_SESSION['email'] = $email;
+    $_SESSION['logged_in'] = true;
     echo json_encode(["success" => true]);
 } else {
     echo json_encode(["success" => false, "message" => "Signup failed"]);

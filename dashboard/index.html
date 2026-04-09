@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Memelabs — Dashboard</title>
-  <link rel="shortcut icon" href="./assets/images/Favicon 1.png" type="image/x-icon">
+  <link rel="shortcut icon" href="../assets/images/Favicon 1.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -422,6 +424,41 @@
     .fade-in:nth-child(3) { animation-delay: 0.15s; }
     .fade-in:nth-child(4) { animation-delay: 0.20s; }
   </style>
+     <style>
+    .spinner {
+      transform-origin: center;
+      animation: rotate 2s linear infinite;
+    }
+    .circle {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: 0;
+      stroke-linecap: round;
+      animation: dash 1.5s ease-in-out infinite;
+    }
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes dash {
+      0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+      50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+      100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+    }
+  </style>  
+    <style>
+    .dot {
+      animation: pulse 0.8s infinite alternate;
+    }
+    .dot2 {
+      animation-delay: 0.2s;
+    }
+    .dot3 {
+      animation-delay: 0.4s;
+    }
+    @keyframes pulse {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0.3; transform: scale(0.8); }
+    }
+  </style>
 </head>
 <body>
 
@@ -478,7 +515,7 @@
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Settings
       </a>
-      <a class="sb-link" href="./login.html" style="color:var(--red);" onclick="return confirm('Sign out?')">
+      <a class="sb-link" style="color:var(--red);" onclick="logout()">
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sign out
       </a>
@@ -486,10 +523,27 @@
 
     <div class="sb-footer">
       <div class="sb-user">
-        <div class="sb-avatar">ML</div>
+        <div class="sb-avatar text-uppper-case" id="sb-avatar"></div>
         <div>
-          <div class="sb-username" id="sb-username">memelabs_user</div>
-          <div class="sb-wallet" id="sb-wallet">0x1a2b...3c4d</div>
+          <div class="sb-username" id="sb-username">
+           <svg width="24" height="24" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" stroke="#f5a623">
+ 
+  <g class="spinner">
+    <circle class="circle" cx="25" cy="25" r="20" fill="none" stroke-width="6"></circle>
+  </g>
+</svg>
+
+</div>
+          <div class="sb-wallet" id="sb-wallet"> 
+
+            <svg width="24" height="6" viewBox="0 0 24 6" xmlns="http://www.w3.org/2000/svg" fill="#f5a623">
+
+  <circle class="dot" cx="3" cy="3" r="3" />
+  <circle class="dot dot2" cx="12" cy="3" r="3" />
+  <circle class="dot dot3" cx="21" cy="3" r="3" />
+</svg>
+
+          </div>
         </div>
       </div>
     </div>
@@ -508,7 +562,12 @@
             <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-        <div class="topbar-greeting">Good morning, <span id="top_bar_username">Trader</span> 👋</div>
+        <div class="topbar-greeting">Good morning, <span id="top_bar_username">  <svg width="24" height="24" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" stroke="#f5a623">
+ 
+  <g class="spinner">
+    <circle class="circle" cx="25" cy="25" r="20" fill="none" stroke-width="6"></circle>
+  </g>
+</svg></span> 👋</div>
       </div>
       <div class="topbar-right">
         <div class="topbar-search">
@@ -648,21 +707,21 @@
   <script>
     /* ══ DEMO DATA ══ */
     const holdings = [
-      { name:"ODAI",     sub:"ODEI AI",    img:"./assets/images/odai.webp",       balance:14230, tokens:47000,   change:+22.5, value:"$14,230" },
-      { name:"TAKEOVER", sub:"Takeover",   img:"./assets/images/takeover.webp",   balance:3820,  tokens:8900,    change:-10.5, value:"$3,820"  },
-      { name:"OSO",      sub:"Osobot",     img:"./assets/images/oso-_1_.webp",    balance:5610,  tokens:7500,    change:+3.7,  value:"$5,610"  },
-      { name:"NOELCLAW", sub:"Noel Claw",  img:"./assets/images/noelclaw.webp",   balance:1230,  tokens:52000,   change:-10.2, value:"$1,230"  },
-      { name:"MLTL",     sub:"Multilabel", img:"./assets/images/mltl.webp",       balance:4470,  tokens:22500,   change:+5.0,  value:"$4,470"  },
+      // { name:"ODAI",     sub:"ODEI AI",    img:"./assets/images/odai.webp",       balance:14230, tokens:47000,   change:+22.5, value:"$14,230" },
+      // { name:"TAKEOVER", sub:"Takeover",   img:"./assets/images/takeover.webp",   balance:3820,  tokens:8900,    change:-10.5, value:"$3,820"  },
+      // { name:"OSO",      sub:"Osobot",     img:"./assets/images/oso-_1_.webp",    balance:5610,  tokens:7500,    change:+3.7,  value:"$5,610"  },
+      // { name:"NOELCLAW", sub:"Noel Claw",  img:"./assets/images/noelclaw.webp",   balance:1230,  tokens:52000,   change:-10.2, value:"$1,230"  },
+      // { name:"MLTL",     sub:"Multilabel", img:"./assets/images/mltl.webp",       balance:4470,  tokens:22500,   change:+5.0,  value:"$4,470"  },
     ];
 
     const activities = [
-      { type:"buy",    icon:"💚", label:"Bought ODAI",     time:"2 mins ago",    amount:"+47,000 ODAI",  amountClass:"pos" },
-      { type:"earn",   icon:"⭐", label:"Fee earned",      time:"15 mins ago",   amount:"+$3.33",        amountClass:"gold" },
-      { type:"sell",   icon:"🔴", label:"Sold NOELCLAW",   time:"1 hour ago",    amount:"-12,000 NOEL",  amountClass:"neg" },
-      { type:"buy",    icon:"💚", label:"Bought TAKEOVER", time:"3 hours ago",   amount:"+8,900 TAKE",   amountClass:"pos" },
-      { type:"earn",   icon:"⭐", label:"Fee earned",      time:"5 hours ago",   amount:"+$12.10",       amountClass:"gold" },
-      { type:"launch", icon:"🚀", label:"Token launched",  time:"Yesterday",     amount:"MLTL",          amountClass:"gold" },
-      { type:"buy",    icon:"💚", label:"Bought OSO",      time:"2 days ago",    amount:"+7,500 OSO",    amountClass:"pos" },
+      { type:"buy",    icon:"💚", label:"Signed Up",     time:"2 mins ago",    amount:"",  amountClass:"pos" },
+      // { type:"earn",   icon:"⭐", label:"Fee earned",      time:"15 mins ago",   amount:"+$3.33",        amountClass:"gold" },
+      // { type:"sell",   icon:"🔴", label:"Sold NOELCLAW",   time:"1 hour ago",    amount:"-12,000 NOEL",  amountClass:"neg" },
+      // { type:"buy",    icon:"💚", label:"Bought TAKEOVER", time:"3 hours ago",   amount:"+8,900 TAKE",   amountClass:"pos" },
+      // { type:"earn",   icon:"⭐", label:"Fee earned",      time:"5 hours ago",   amount:"+$12.10",       amountClass:"gold" },
+      // { type:"launch", icon:"🚀", label:"Token launched",  time:"Yesterday",     amount:"MLTL",          amountClass:"gold" },
+      // { type:"buy",    icon:"💚", label:"Bought OSO",      time:"2 days ago",    amount:"+7,500 OSO",    amountClass:"pos" },
     ];
 
     const movers = [
@@ -683,18 +742,18 @@
 
     /* ══ PORTFOLIO STATS ══ */
     const totalValue  = holdings.reduce((s,h) => s + h.balance, 0);
-    const totalChange = 14.3;
+    const totalChange = 0;
     const gainToday   = totalValue * (totalChange/100);
 
     document.getElementById("portfolioValue").textContent  = "$" + totalValue.toLocaleString();
     document.getElementById("portfolioChange").textContent = "↑ " + totalChange + "% today";
     document.getElementById("gainValue").textContent       = "+$" + gainToday.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-    document.getElementById("totalEarned").textContent     = "$15.43";
+    document.getElementById("totalEarned").textContent     = "$0.0";
     document.getElementById("tokensHeld").textContent      = holdings.length;
-    document.getElementById("allTimePL").textContent       = "+$3,260";
-    document.getElementById("creatorEarnings").textContent = "$15.43";
-    document.getElementById("totalTrades").textContent     = "24";
-    document.getElementById("lbRank").textContent          = "#4";
+    document.getElementById("allTimePL").textContent       = "+$0";
+    document.getElementById("creatorEarnings").textContent = "$0.0";
+    document.getElementById("totalTrades").textContent     = "0";
+    document.getElementById("lbRank").textContent          = "# ~";
 
     const best = [...holdings].sort((a,b) => b.change - a.change)[0];
     document.getElementById("bestPerformer").textContent = best.name;

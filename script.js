@@ -63,7 +63,7 @@
           'success'
         );
 
-        setTimeout(() => { window.location.href = '/dashboard'; }, 1200);
+        setTimeout(() => { window.location.href = './dashboard'; }, 1200);
 
       } catch (err) {
         const msg = err.code === 4001

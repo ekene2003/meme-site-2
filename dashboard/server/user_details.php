@@ -2,11 +2,13 @@
 session_start();
 header('Content-Type: application/json');
 
-$address = $_SESSION['wallet'];
+
 if (isset($_SESSION['logged_in'])) {
     require('config.php');
-    $address = mysqli_real_escape_string($conn, $address);
-    if ($_SESSION['wallet']) {
+    
+    if (isset($_SESSION['wallet'])) {
+        $address = mysqli_real_escape_string($conn, $address);
+        $address = $_SESSION['wallet'];
         $qry = "SELECT * FROM users WHERE wallet = ?";
 
         $run = mysqli_prepare($conn, $qry);
@@ -22,8 +24,9 @@ if (isset($_SESSION['logged_in'])) {
         } else {
             echo json_encode(["error" => "User not found"]);
         }
-    } else if ($_SESSION['email']) {
-        $qry = "SELECT * FROM users WHERE wallet = ?";
+    } else if (isset($_SESSION['email'])) {
+        $email = $_SESSION['email'];
+        $qry = "SELECT * FROM users WHERE email = ?";
         $email = mysqli_real_escape_string($conn,$email);
 
         $run = mysqli_prepare($conn, $qry);
@@ -42,4 +45,7 @@ if (isset($_SESSION['logged_in'])) {
     } else {
         echo json_encode(["error" => "Not authenticated"]);
     }
+}else{
+    
+    // header('location:logout.php');
 }

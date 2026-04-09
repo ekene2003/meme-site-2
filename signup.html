@@ -6,8 +6,11 @@
   <title>Memelabs — Sign Up</title>
   <link rel="shortcut icon" href="./assets/images/Favicon 1.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.umd.min.js"></script>
+  <link rel="stylesheet" href="script.css">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -353,16 +356,24 @@
 
     <div class="auth-divider"><span>or sign up with</span></div>
 
-    <button class="btn-wallet" onclick="connectWallet()">
-      <div class="wallet-icon">⬡</div>
-      Connect Wallet
+    <!-- <div class="auth-divider"><span>or continue with</span></div> -->
+        <button class="wallet-btn" id="btn-metamask" onclick="connectWallet('metamask')">
+      <div class="wallet-icon metamask-icon">🦊</div>
+      <div class="wallet-btn-text">
+        <span class="wallet-btn-label">MetaMask</span>
+        <span class="wallet-btn-sub">Wallet Login</span>
+      </div>
     </button>
+<div class="status" id="status"></div>
 
+   <div class="auth-divider"><span> By connecting, you agree to our Terms of Service.<br>This request will not trigger a blockchain transaction.</span></div>
+  
     <div class="auth-switch">
       Already have an account? <a href="./login.html">Sign in</a>
     </div>
 
   </div>
+  <script src="script.js"></script>
 
   <script>
     function togglePassword(id, btn) {
@@ -477,7 +488,7 @@
       document.getElementById("step3label").className = "step-label active";
 
       setTimeout(() => {
-        window.location.href = "./dashboard.html";
+        window.location.href = "./dashboard";
       }, 1500);
 
     } else {
@@ -503,11 +514,11 @@
   btn.textContent = "Sign Up";
   btn.disabled = false;
 }
-    function connectWallet() {
-      const btn = document.querySelector(".btn-wallet");
-      btn.textContent = "Connecting...";
-      setTimeout(() => { window.location.href = "./dashboard.html"; }, 1000);
-    }
+    // function connectWallet() {
+    //   const btn = document.querySelector(".btn-wallet");
+    //   btn.textContent = "Connecting...";
+    //   setTimeout(() => { window.location.href = "./dashboard.html"; }, 1000);
+    // }
   </script>
 </body>
 </html>

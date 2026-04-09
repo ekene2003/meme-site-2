@@ -43,10 +43,11 @@ if (!$result['success']) {
     exit;
 }
 
-// ✅ SUCCESS → create session
+//  SUCCESS → create session
 session_regenerate_id(true);
 $_SESSION['wallet'] = $address;
 $_SESSION['logged_in'] = true;
+$_SESSION['type'] = 'wallet';
 require('config.php');
 mysqli_real_escape_string($conn,$address);
          
@@ -66,6 +67,9 @@ if($num_email < 1){
     $run = mysqli_prepare($conn,$qry);
     mysqli_stmt_bind_param($run,"ss",$username,$address);
     mysqli_stmt_execute($run);
+      $lastId = mysqli_insert_id($conn); 
+    $_SESSION['user_id'] = $lastId;
+    $_SESSION['user_name'] = $username;
 }
 
 echo json_encode(['success' => true]);
