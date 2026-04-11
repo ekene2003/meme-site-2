@@ -7,444 +7,208 @@
   <link rel="shortcut icon" href="./assets/images/Favicon 1.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --gold:      #f5a623;
-      --gold-dark: #d4891a;
-      --gold-dim:  rgba(245,166,35,0.12);
-      --gold-bdr:  rgba(245,166,35,0.2);
-      --bg:        #08060a;
-      --surface:   rgba(18,14,4,0.92);
-      --text:      #fff;
-      --muted:     rgba(255,255,255,0.4);
-    }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px 0;
-      position: relative; overflow-x: hidden;
-    }
-
-    .bg-orb {
-      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-    }
-    .bg-orb-1 {
-      width: 500px; height: 500px; top: -150px; right: -80px;
-      background: radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 65%);
-      animation: drift 12s ease-in-out infinite;
-    }
-    .bg-orb-2 {
-      width: 350px; height: 350px; bottom: -100px; left: -60px;
-      background: radial-gradient(circle, rgba(245,166,35,0.07) 0%, transparent 65%);
-      animation: drift 15s ease-in-out infinite reverse;
-    }
-    .bg-grid {
-      position: fixed; inset: 0; z-index: 0;
-      background-image:
-        linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px);
-      background-size: 48px 48px; pointer-events: none;
-    }
-    @keyframes drift {
-      0%,100% { transform: translateY(0) scale(1); }
-      50%      { transform: translateY(-30px) scale(1.05); }
-    }
-
-    .auth-card {
-      position: relative; z-index: 1;
-      width: 100%; max-width: 440px; margin: 20px;
-      background: var(--surface);
-      border: 1px solid var(--gold-bdr);
-      border-radius: 24px; padding: 40px 36px;
-      backdrop-filter: blur(20px);
-      animation: slideUp 0.4s ease;
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .auth-logo {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 28px; text-decoration: none;
-    }
-    .auth-logo img  { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
-    .auth-logo span { font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
-
-    .auth-title { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; margin-bottom: 6px; }
-    .auth-sub   { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.5; }
-
-    /* Steps indicator */
-    .steps {
-      display: flex; align-items: center; gap: 0;
-      margin-bottom: 28px;
-    }
-    .step {
-      display: flex; align-items: center; gap: 8px; flex: 1;
-    }
-    .step-circle {
-      width: 28px; height: 28px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.15);
-      color: var(--muted); background: transparent;
-      transition: all 0.3s;
-    }
-    .step-circle.active {
-      background: var(--gold); border-color: var(--gold); color: #000;
-    }
-    .step-circle.done {
-      background: rgba(74,222,128,0.15); border-color: #4ade80; color: #4ade80;
-    }
-    .step-label { font-size: 11px; color: var(--muted); font-weight: 500; }
-    .step-label.active { color: var(--gold); }
-    .step-line {
-      flex: 1; height: 1px; background: rgba(255,255,255,0.1);
-      margin: 0 8px;
-    }
-    .step-line.done { background: var(--gold); }
-
-    .form-group { margin-bottom: 14px; }
-
-    label {
-      display: block; font-size: 12px; font-weight: 600;
-      color: var(--muted); letter-spacing: 0.06em;
-      text-transform: uppercase; margin-bottom: 8px;
-    }
-
-    .input-wrap { position: relative; }
-    .input-wrap svg {
-      position: absolute; left: 14px; top: 50%;
-      transform: translateY(-50%);
-      color: rgba(255,255,255,0.25); pointer-events: none;
-    }
-
-    input[type="email"],
-    input[type="password"],
-    input[type="text"] {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 13px 14px 13px 42px;
-      font-size: 14px; color: var(--text);
-      font-family: 'DM Sans', sans-serif; outline: none;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    input::placeholder { color: rgba(255,255,255,0.2); }
-    input:focus { border-color: rgba(245,166,35,0.5); background: rgba(245,166,35,0.04); }
-
-    input.valid   { border-color: rgba(74,222,128,0.4); }
-    input.invalid { border-color: rgba(248,113,113,0.4); }
-
-    .input-toggle {
-      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-      background: none; border: none; cursor: pointer;
-      color: rgba(255,255,255,0.3); transition: color 0.15s;
-    }
-    .input-toggle:hover { color: var(--gold); }
-
-    .field-hint {
-      font-size: 11px; color: var(--muted); margin-top: 5px; padding-left: 2px;
-    }
-
-    /* Strength meter */
-    .strength-bar {
-      display: flex; gap: 4px; margin-top: 8px;
-    }
-    .strength-seg {
-      flex: 1; height: 3px; border-radius: 2px;
-      background: rgba(255,255,255,0.1); transition: background 0.3s;
-    }
-    .strength-label { font-size: 11px; color: var(--muted); margin-top: 5px; }
-
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--gold:#f5a623;--gold-dark:#d4891a;--gold-dim:rgba(245,166,35,0.1);--gold-bdr:rgba(245,166,35,0.2);--bg:#08060a;--surface:rgba(18,14,4,0.95);--text:#fff;--muted:rgba(255,255,255,0.4);}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px 0;position:relative;overflow-x:hidden;}
+    .bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
+    .bg-orb-1{width:500px;height:500px;top:-150px;right:-80px;background:radial-gradient(circle,rgba(245,166,35,0.12) 0%,transparent 65%);animation:drift 12s ease-in-out infinite;}
+    .bg-orb-2{width:350px;height:350px;bottom:-100px;left:-60px;background:radial-gradient(circle,rgba(245,166,35,0.07) 0%,transparent 65%);animation:drift 15s ease-in-out infinite reverse;}
+    .bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(245,166,35,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(245,166,35,0.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+    @keyframes drift{0%,100%{transform:translateY(0);}50%{transform:translateY(-30px);}}
+    .card{position:relative;z-index:1;width:100%;max-width:440px;margin:20px;background:var(--surface);border:1px solid var(--gold-bdr);border-radius:24px;padding:40px 36px;backdrop-filter:blur(20px);animation:up .4s ease;}
+    @keyframes up{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+    .logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;text-decoration:none;}
+    .logo img{width:36px;height:36px;border-radius:8px;object-fit:cover;}
+    .logo span{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.02em;}
+    h1{font-size:26px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;}
+    .sub{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.5;}
+    /* Steps */
+    .steps{display:flex;align-items:center;margin-bottom:28px;}
+    .step{display:flex;align-items:center;gap:8px;}
+    .sc{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;border:1px solid rgba(255,255,255,.15);color:var(--muted);transition:all .3s;}
+    .sc.active{background:var(--gold);border-color:var(--gold);color:#000;}
+    .sc.done{background:rgba(74,222,128,.15);border-color:#4ade80;color:#4ade80;}
+    .sl{font-size:11px;color:var(--muted);font-weight:500;}
+    .sl.active{color:var(--gold);}
+    .sline{flex:1;height:1px;background:rgba(255,255,255,.1);margin:0 8px;transition:background .3s;}
+    .sline.done{background:var(--gold);}
+    /* Form */
+    .fg{margin-bottom:14px;}
+    label.lbl{display:block;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+    .iw{position:relative;}
+    .iw svg.icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.25);pointer-events:none;width:16px;height:16px;}
+    input[type=email],input[type=password],input[type=text]{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 44px 13px 42px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,background .2s;}
+    input::placeholder{color:rgba(255,255,255,.2);}
+    input:focus{border-color:rgba(245,166,35,.5);background:rgba(245,166,35,.04);}
+    input.valid{border-color:rgba(74,222,128,.4);}
+    input.invalid{border-color:rgba(248,113,113,.4);}
+    .eye-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;padding:4px;transition:color .15s;}
+    .eye-btn:hover{color:var(--gold);}
+    .eye-btn svg{width:16px;height:16px;pointer-events:none;}
+    .hint{font-size:11px;color:var(--muted);margin-top:5px;padding-left:2px;}
+    /* Strength */
+    .sbar{display:flex;gap:4px;margin-top:8px;}
+    .sseg{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.1);transition:background .3s;}
+    .slbl{font-size:11px;color:var(--muted);margin-top:5px;}
     /* Terms */
-    .terms-wrap {
-      display: flex; align-items: flex-start; gap: 10px;
-      margin-bottom: 20px; cursor: pointer;
-    }
-    .terms-wrap input[type="checkbox"] { display: none; }
-    .custom-check {
-      width: 18px; height: 18px; border-radius: 5px; flex-shrink: 0; margin-top: 1px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.04);
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-    }
-    .terms-wrap input:checked + .custom-check {
-      background: var(--gold); border-color: var(--gold);
-    }
-    .terms-wrap input:checked + .custom-check::after {
-      content: '✓'; font-size: 11px; color: #000; font-weight: 700;
-    }
-    .terms-text {
-      font-size: 13px; color: var(--muted); line-height: 1.5;
-    }
-    .terms-text a { color: var(--gold); text-decoration: none; font-weight: 500; }
-    .terms-text a:hover { opacity: 0.75; }
-
-    .btn-submit {
-      width: 100%; padding: 14px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-      border: none; border-radius: 999px;
-      font-size: 15px; font-weight: 700;
-      font-family: 'DM Sans', sans-serif;
-      color: #000; cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 20px rgba(245,166,35,0.25);
-      margin-bottom: 20px;
-    }
-    .btn-submit:hover  { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245,166,35,0.35); }
-    .btn-submit:active { transform: scale(0.98); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .auth-divider {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-    }
-    .auth-divider::before, .auth-divider::after {
-      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
-    }
-    .auth-divider span { font-size: 12px; color: var(--muted); }
-
-    .btn-wallet {
-      width: 100%; padding: 13px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 999px;
-      font-size: 14px; font-weight: 600;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text); cursor: pointer;
-      transition: all 0.2s;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      margin-bottom: 24px;
-    }
-    .btn-wallet:hover { border-color: var(--gold-bdr); background: var(--gold-dim); }
-    .wallet-icon { width: 22px; height: 22px; background: linear-gradient(135deg,var(--gold),var(--gold-dark)); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-
-    .auth-switch { text-align: center; font-size: 14px; color: var(--muted); }
-    .auth-switch a { color: var(--gold); font-weight: 600; text-decoration: none; }
-    .auth-switch a:hover { opacity: 0.75; }
-
-    @media (max-width: 480px) {
-      .auth-card { padding: 28px 20px; }
-      .auth-title { font-size: 22px; }
-      .step-label { display: none; }
-    }
+    .terms{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;cursor:pointer;}
+    .terms input{display:none;}
+    .tbox{width:18px;height:18px;border-radius:5px;flex-shrink:0;margin-top:1px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;transition:all .2s;}
+    .terms input:checked+.tbox{background:var(--gold);border-color:var(--gold);}
+    .terms input:checked+.tbox::after{content:'✓';font-size:11px;color:#000;font-weight:700;}
+    .ttxt{font-size:13px;color:var(--muted);line-height:1.5;}
+    .ttxt a{color:var(--gold);text-decoration:none;font-weight:500;}
+    .btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border:none;border-radius:999px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;color:#000;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(245,166,35,.25);margin-bottom:20px;}
+    .btn-primary:hover{transform:translateY(-1px);}
+    .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+    .divider{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.08);}
+    .divider span{font-size:12px;color:var(--muted);}
+    .btn-wallet{width:100%;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:999px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;color:var(--text);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px;}
+    .btn-wallet:hover{border-color:var(--gold-bdr);background:var(--gold-dim);}
+    .wi{width:22px;height:22px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;}
+    .sw{text-align:center;font-size:14px;color:var(--muted);}
+    .sw a{color:var(--gold);font-weight:600;text-decoration:none;}
+    @media(max-width:480px){.card{padding:28px 20px;}h1{font-size:22px;}.sl{display:none;}}
   </style>
 </head>
 <body>
-
-  <div class="bg-grid"></div>
-  <div class="bg-orb bg-orb-1"></div>
-  <div class="bg-orb bg-orb-2"></div>
-
-  <div class="auth-card">
-
-    <a href="./index.html" class="auth-logo">
-      <img src="./assets/images/Memelabs Logo 1.png" alt="Logo">
-      <span>Memelabs</span>
-    </a>
-
-    <div class="auth-title">Create account</div>
-    <div class="auth-sub">Join thousands of traders launching and earning on Memelabs.</div>
-
-    <!-- Step indicator -->
-    <div class="steps">
-      <div class="step">
-        <div class="step-circle active" id="step1circle">1</div>
-        <span class="step-label active" id="step1label">Account</span>
-      </div>
-      <div class="step-line" id="line1"></div>
-      <div class="step">
-        <div class="step-circle" id="step2circle">2</div>
-        <span class="step-label" id="step2label">Security</span>
-      </div>
-      <div class="step-line" id="line2"></div>
-      <div class="step">
-        <div class="step-circle" id="step3circle">3</div>
-        <span class="step-label" id="step3label">Done</span>
-      </div>
-    </div>
-
-    <form onsubmit="handleSignup(event)" id="signupForm">
-
-      <!-- Step 1: Basic info -->
-      <div id="formStep1">
-        <div class="form-group">
-          <label>Username</label>
-          <div class="input-wrap">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            <input type="text" placeholder="cooltrader99" id="username" oninput="validateUsername(this)" required>
-          </div>
-          <div class="field-hint" id="usernameHint">3–20 characters, letters and numbers only</div>
-        </div>
-
-        <div class="form-group">
-          <label>Email address</label>
-          <div class="input-wrap">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-            <input type="email" placeholder="you@example.com" id="signupEmail" oninput="validateEmail(this)" required>
-          </div>
-        </div>
-
-        <button type="button" class="btn-submit" onclick="goStep(2)">Continue →</button>
-      </div>
-
-      <!-- Step 2: Password -->
-      <div id="formStep2" style="display:none;">
-        <div class="form-group">
-          <label>Password</label>
-          <div class="input-wrap">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            <input type="password" placeholder="Create a strong password" id="signupPassword" oninput="checkStrength(this.value)" required>
-            <button type="button" class="input-toggle" onclick="togglePassword('signupPassword',this)">
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
-            </button>
-          </div>
-          <div class="strength-bar">
-            <div class="strength-seg" id="s1"></div>
-            <div class="strength-seg" id="s2"></div>
-            <div class="strength-seg" id="s3"></div>
-            <div class="strength-seg" id="s4"></div>
-          </div>
-          <div class="strength-label" id="strengthLabel">Enter a password</div>
-        </div>
-
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <div class="input-wrap">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            <input type="password" placeholder="Repeat your password" id="confirmPassword" oninput="validateConfirm(this)" required>
-          </div>
-        </div>
-
-        <label class="terms-wrap" style="margin-top:4px;">
-          <input type="checkbox" id="terms" required>
-          <div class="custom-check"></div>
-          <span class="terms-text">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
-        </label>
-
-        <button type="submit" class="btn-submit">Create Account</button>
-      </div>
-
-    </form>
-
-    <div class="auth-divider"><span>or sign up with</span></div>
-
-    <button class="btn-wallet" onclick="connectWallet()">
-      <div class="wallet-icon">⬡</div>
-      Connect Wallet
-    </button>
-
-    <div class="auth-switch">
-      Already have an account? <a href="./login.html">Sign in</a>
-    </div>
-
+<div class="bg-grid"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+ 
+<div class="card">
+  <a href="./index.html" class="logo">
+    <img src="./assets/images/Memelabs Logo 1.png" alt="Logo" onerror="this.style.display='none'">
+    <span>Memelabs</span>
+  </a>
+  <h1>Create account</h1>
+  <p class="sub">Join thousands of traders launching and earning on Memelabs.</p>
+ 
+  <div class="steps">
+    <div class="step"><div class="sc active" id="s1c">1</div><span class="sl active" id="s1l">Account</span></div>
+    <div class="sline" id="ln1"></div>
+    <div class="step"><div class="sc" id="s2c">2</div><span class="sl" id="s2l">Security</span></div>
+    <div class="sline" id="ln2"></div>
+    <div class="step"><div class="sc" id="s3c">3</div><span class="sl" id="s3l">Done</span></div>
   </div>
-
-  <script>
-    function togglePassword(id, btn) {
-      const input = document.getElementById(id);
-      const isText = input.type === "text";
-      input.type = isText ? "password" : "text";
-      btn.style.color = isText ? "rgba(255,255,255,0.3)" : "var(--gold)";
-    }
-
-    function validateUsername(input) {
-      const valid = /^[a-zA-Z0-9_]{3,20}$/.test(input.value);
-      input.className = input.value ? (valid ? "valid" : "invalid") : "";
-    }
-
-    function validateEmail(input) {
-      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
-      input.className = input.value ? (valid ? "valid" : "invalid") : "";
-    }
-
-    function validateConfirm(input) {
-      const pw = document.getElementById("signupPassword").value;
-      input.className = input.value ? (input.value === pw ? "valid" : "invalid") : "";
-    }
-
-    function checkStrength(pw) {
-      const segs   = [s1, s2, s3, s4];
-      const label  = document.getElementById("strengthLabel");
-      const colors = ["#f87171","#fbbf24","#f5a623","#4ade80"];
-      const labels = ["Weak","Fair","Good","Strong"];
-
-      let score = 0;
-      if (pw.length >= 8)            score++;
-      if (/[A-Z]/.test(pw))          score++;
-      if (/[0-9]/.test(pw))          score++;
-      if (/[^A-Za-z0-9]/.test(pw))   score++;
-
-      segs.forEach((s, i) => {
-        s.style.background = i < score ? colors[score - 1] : "rgba(255,255,255,0.1)";
-      });
-      label.textContent  = pw ? labels[score - 1] || "Weak" : "Enter a password";
-      label.style.color  = pw ? colors[score - 1] : "rgba(255,255,255,0.4)";
-    }
-
-    function goStep(n) {
-      const username = document.getElementById("username").value;
-      const email    = document.getElementById("signupEmail").value;
-      if (!username || !email) return;
-
-      document.getElementById("formStep1").style.display = "none";
-      document.getElementById("formStep2").style.display = "block";
-
-      // Update step UI
-      document.getElementById("step1circle").className = "step-circle done";
-      document.getElementById("step1circle").textContent = "✓";
-      document.getElementById("line1").classList.add("done");
-      document.getElementById("step2circle").className = "step-circle active";
-      document.getElementById("step2label").className  = "step-label active";
-    }
-
-    function handleSignup(e) {
-      e.preventDefault();
-      const pw  = document.getElementById("signupPassword").value;
-      const cpw = document.getElementById("confirmPassword").value;
-      if (pw !== cpw) { alert("Passwords don't match!"); return; }
-
-      const btn = e.target.querySelector(".btn-submit");
-      btn.textContent = "Creating account...";
-      btn.disabled    = true;
-
-      // Update step 3
-      document.getElementById("step2circle").className = "step-circle done";
-      document.getElementById("step2circle").textContent = "✓";
-      document.getElementById("line2").classList.add("done");
-      document.getElementById("step3circle").className = "step-circle active";
-      document.getElementById("step3label").className  = "step-label active";
-
-      setTimeout(() => { window.location.href = "./dashboard.html"; }, 1200);
-    }
-
-    function connectWallet() {
-      const btn = document.querySelector(".btn-wallet");
-      btn.textContent = "Connecting...";
-      setTimeout(() => { window.location.href = "./dashboard.html"; }, 1000);
-    }
-  </script>
+ 
+  <form id="signupForm">
+    <!-- Step 1 -->
+    <div id="step1">
+      <div class="fg">
+        <label class="lbl">Username</label>
+        <div class="iw">
+          <svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="username" placeholder="cooltrader99" oninput="checkUser(this)" required>
+        </div>
+        <div class="hint">3–20 characters, letters and numbers only</div>
+      </div>
+      <div class="fg">
+        <label class="lbl">Email address</label>
+        <div class="iw">
+          <svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input type="email" id="email" placeholder="you@example.com" oninput="checkEmail(this)" required>
+        </div>
+      </div>
+      <button type="button" class="btn-primary" onclick="goStep2()">Continue →</button>
+    </div>
+ 
+    <!-- Step 2 -->
+    <div id="step2" style="display:none">
+      <div class="fg">
+        <label class="lbl">Password</label>
+        <div class="iw">
+          <svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="pw1" placeholder="Create a strong password" oninput="checkStrength(this.value)" required>
+          <button type="button" class="eye-btn" id="togglePw1">
+            <svg id="show1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="hide1" style="display:none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <div class="sbar"><div class="sseg" id="ss1"></div><div class="sseg" id="ss2"></div><div class="sseg" id="ss3"></div><div class="sseg" id="ss4"></div></div>
+        <div class="slbl" id="strengthLbl">Enter a password</div>
+      </div>
+      <div class="fg">
+        <label class="lbl">Confirm Password</label>
+        <div class="iw">
+          <svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="pw2" placeholder="Repeat your password" oninput="checkConfirm(this)" required>
+          <button type="button" class="eye-btn" id="togglePw2">
+            <svg id="show2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="hide2" style="display:none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+      <label class="terms" style="margin-top:4px">
+        <input type="checkbox" id="terms" required>
+        <div class="tbox"></div>
+        <span class="ttxt">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+      </label>
+      <button type="submit" class="btn-primary" id="submitBtn">Create Account</button>
+    </div>
+  </form>
+ 
+  <div class="divider"><span>or sign up with</span></div>
+  <button class="btn-wallet" onclick="window.location.href='./dashboard.html'"><div class="wi">⬡</div>Connect Wallet</button>
+  <div class="sw">Already have an account? <a href="./login.html">Sign in</a></div>
+</div>
+ 
+<script>
+  // Password toggle for pw1
+  document.getElementById('togglePw1').addEventListener('click', function() {
+    const inp = document.getElementById('pw1');
+    const isHidden = inp.type === 'password';
+    inp.type = isHidden ? 'text' : 'password';
+    document.getElementById('show1').style.display = isHidden ? 'none' : 'block';
+    document.getElementById('hide1').style.display = isHidden ? 'block' : 'none';
+    this.style.color = isHidden ? 'var(--gold)' : 'rgba(255,255,255,0.3)';
+  });
+ 
+  // Password toggle for pw2
+  document.getElementById('togglePw2').addEventListener('click', function() {
+    const inp = document.getElementById('pw2');
+    const isHidden = inp.type === 'password';
+    inp.type = isHidden ? 'text' : 'password';
+    document.getElementById('show2').style.display = isHidden ? 'none' : 'block';
+    document.getElementById('hide2').style.display = isHidden ? 'block' : 'none';
+    this.style.color = isHidden ? 'var(--gold)' : 'rgba(255,255,255,0.3)';
+  });
+ 
+  function checkUser(i){ i.className=i.value?(/^[a-zA-Z0-9_]{3,20}$/.test(i.value)?'valid':'invalid'):''; }
+  function checkEmail(i){ i.className=i.value?(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(i.value)?'valid':'invalid'):''; }
+  function checkConfirm(i){ i.className=i.value?(i.value===document.getElementById('pw1').value?'valid':'invalid'):''; }
+ 
+  function checkStrength(pw) {
+    const segs=['ss1','ss2','ss3','ss4'], cols=['#f87171','#fbbf24','#f5a623','#4ade80'], lbls=['Weak','Fair','Good','Strong'];
+    let score=0;
+    if(pw.length>=8)score++; if(/[A-Z]/.test(pw))score++; if(/[0-9]/.test(pw))score++; if(/[^A-Za-z0-9]/.test(pw))score++;
+    segs.forEach((s,i)=>{ document.getElementById(s).style.background=i<score?cols[score-1]:'rgba(255,255,255,0.1)'; });
+    const lbl=document.getElementById('strengthLbl');
+    lbl.textContent=pw?(lbls[score-1]||'Weak'):'Enter a password';
+    lbl.style.color=pw?cols[score-1]:'rgba(255,255,255,0.4)';
+  }
+ 
+  function goStep2() {
+    const u=document.getElementById('username').value, e=document.getElementById('email').value;
+    if(!u||!e){alert('Please fill in all fields');return;}
+    document.getElementById('step1').style.display='none';
+    document.getElementById('step2').style.display='block';
+    document.getElementById('s1c').className='sc done'; document.getElementById('s1c').textContent='✓';
+    document.getElementById('ln1').classList.add('done');
+    document.getElementById('s2c').className='sc active';
+    document.getElementById('s2l').className='sl active';
+  }
+ 
+  document.getElementById('signupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if(document.getElementById('pw1').value!==document.getElementById('pw2').value){alert("Passwords don't match!");return;}
+    const btn=document.getElementById('submitBtn'); btn.textContent='Creating...'; btn.disabled=true;
+    document.getElementById('s2c').className='sc done'; document.getElementById('s2c').textContent='✓';
+    document.getElementById('ln2').classList.add('done');
+    document.getElementById('s3c').className='sc active'; document.getElementById('s3l').className='sl active';
+    setTimeout(()=>{ window.location.href='./dashboard.html'; },1200);
+  });
+</script>
 </body>
 </html>
